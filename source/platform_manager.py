@@ -17,9 +17,14 @@ COMPONENT_URLS: Dict[str, str] = {
 }
 
 data_collection_url = "http://localhost:5001/start_work"
+CONFIG_PARAMS_PATH = "./platform_manager/configuration_parameters.json"
+ADVERSARY_MODEL_PATH = "./platform_manager/adversary_model.json"
 
 model_file_path = "./platform_manager/saved_models/mlp_modelWithParam.pth"
 
+def load_json_file(file_path: str) -> Dict[str, Any]:
+    with open(file_path, "r") as f:
+        return json.load(f)
 
 def send_config(url: str, config_data: Dict[str, Any]) -> bool:
     """Send configuration data to a specified component."""
@@ -128,9 +133,9 @@ def configure_platform(config_data):
         return jsonify({"status": "failure", "message": "Platform configuration unsuccessful."}), 500
 
 
-@app.route('/load_config', methods=['POST'])
+""" @app.route('/load_config', methods=['POST'])
 def load_config():
-    """Load platform configuration from a JSON file."""
+    #Load platform configuration from a JSON file.
     if 'file' not in request.files:
         return jsonify({"status": "failure", "message": "No file part"}), 400
 
@@ -142,8 +147,23 @@ def load_config():
         config_data = json.load(file)
         return configure_platform(config_data)  # Call the configure_platform function with the loaded config
     except Exception as e:
-        return jsonify({"status": "failure", "message": f"Error processing file: {e}"}), 500
+        return jsonify({"status": "failure", "message": f"Error processing file: {e}"}), 500 """
 
+@app.route('/start_platform_from_files', methods=['POST'])
+def start_platform_from_files():
+    """Carica configuration_parameters.json e adversary_model.json e avvia la configurazione."""
+    try:
+        config_params = load_json_file(CONFIG_PARAMS_PATH)
+        adversary_model = load_json_file(ADVERSARY_MODEL_PATH)
+
+        # Unisci i due dizionari in uno solo
+        full_config = {**config_params, **adversary_model}
+
+        # Chiama il gestore principale
+        return configure_platform(full_config)
+
+    except Exception as e:
+        return jsonify({"status": "failure", "message": f"Errore nel caricamento file JSON: {e}"}), 500
 
 if __name__ == '__main__':
     app.run(port=5000)  # Run on port 5000 by default

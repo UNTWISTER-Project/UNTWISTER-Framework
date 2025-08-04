@@ -1,0 +1,153 @@
+{
+    "attack_mitigation": {
+        "json_modify": {
+            "{ego}.egoInstance.x0": "ego_x",
+            "{lead}.leadInstance.simple_car.x0": "lead_x",
+            "{ego}.egoInstance.v0": "ego_speed",
+            "{lead}.leadInstance.simple_car.v0": "lead_speed",
+            "{cacc}.caccInstance.initialAccel": "cacc_accel",
+            "{acc}.accInstance.customSignalFromTimestamp.currentTimestamp": "timeoffset"
+        },
+        "attacks": {
+            "1": {
+                "conf_prediction": {
+                    "fmus": {
+                      "{lead}": "LeadCarPrediction.fmu",
+                      "{ego}": "Simple_car.fmu",
+                      "{cacc}": "CACCController.fmu",
+                      "{acc}": "LeadAccelerationFromCurrentTimestamp.fmu",
+                      "{ramp_attack}": "attackRampWorstScenario.fmu"
+                    },
+                    "connections": {
+                      "{lead}.leadInstance.outputAccel": [
+                        "{cacc}.caccInstance.accel_in"
+                      ],
+                      "{lead}.leadInstance.speed": [
+                        "{ramp_attack}.ramp_attackInstance.param"
+                      ],
+                      "{lead}.leadInstance.x": [
+                        "{cacc}.caccInstance.lead_x"
+                      ],
+                      "{cacc}.caccInstance.desiredAcceleration": [
+                        "{ego}.egoInstance.accel"
+                      ],
+                      "{ramp_attack}.ramp_attackInstance.attackedParam": [
+                        "{cacc}.caccInstance.lead_speed"
+                      ],
+                      "{ego}.egoInstance.speed": [
+                        "{cacc}.caccInstance.ego_speed"
+                      ],
+                      "{ego}.egoInstance.x": [
+                        "{cacc}.caccInstance.ego_x"
+                      ],
+                      "{acc}.accInstance.acceleration": [
+                        "{lead}.leadInstance.inputAccel"
+                      ]
+                    },
+                    "parameters": {
+                      "{lead}.leadInstance.simple_car.v0": 8.33,
+                      "{lead}.leadInstance.simple_car.x0": 30,
+                      "{cacc}.caccInstance.c1": 0.5,
+                      "{cacc}.caccInstance.eps": 1,
+                      "{cacc}.caccInstance.omega_n": 0.2,
+                      "{cacc}.caccInstance.initialAccel": 0,
+                      "{cacc}.caccInstance.targetDistance": 15,
+                      "{ramp_attack}.ramp_attackInstance.attackTime": 0,
+                      "{ramp_attack}.ramp_attackInstance.duration": 30,
+                      "{ramp_attack}.ramp_attackInstance.rampValue": 0.3,
+                      "{ego}.egoInstance.v0": 8.33,
+                      "{ego}.egoInstance.x0": 5
+                    },
+                    "algorithm": {
+                        "type": "fixed-step",
+                        "size": 0.01
+                    },
+                    "simulationProgramDelay": false
+                },
+                "critical_scenarios": {
+                    "event_1": { 
+                        "expression": "abs({ego}.egoInstance.x - {lead}.leadInstance.x) < 2", 
+                        "sensor": "cacc_sensor",
+                        "command": 2
+                    },
+                    "event_2": {
+                        "expression": "abs({ego}.egoInstance.x - {lead}.leadInstance.x) >= 30",
+                        "sensor": "cacc_sensor",
+                        "command": 5
+                    }
+                }
+            },
+            "2": {
+                "conf_prediction": {
+                    "fmus": {
+                        "{acc}": "LeadAccelerationFromCurrentTimestamp.fmu",
+                        "{lead}": "LeadCarPrediction.fmu",
+                        "{ego}": "Simple_car.fmu",
+                        "{cacc}": "CACCController.fmu",
+                        "{attack_plus_constant}": "attackPlusConstantWorstScenario.fmu"
+                    },
+                    "connections": {
+                        "{acc}.accInstance.acceleration": [
+                        "{lead}.leadInstance.inputAccel"
+                        ],
+                        "{lead}.leadInstance.x": [
+                        "{cacc}.caccInstance.lead_x"
+                        ],
+                        "{lead}.leadInstance.speed": [
+                        "{attack_plus_constant}.attack_plus_constantInstance.param"
+                        ],
+                        "{lead}.leadInstance.outputAccel": [
+                        "{cacc}.caccInstance.accel_in"
+                        ],
+                        "{cacc}.caccInstance.desiredAcceleration": [
+                        "{ego}.egoInstance.accel"
+                        ],
+                        "{attack_plus_constant}.attack_plus_constantInstance.attackedParam": [
+                        "{cacc}.caccInstance.lead_speed"
+                        ],
+                        "{ego}.egoInstance.speed": [
+                        "{cacc}.caccInstance.ego_speed"
+                        ],
+                        "{ego}.egoInstance.x": [
+                        "{cacc}.caccInstance.ego_x"
+                        ]
+                    },
+                    "parameters": {
+                        "{lead}.leadInstance.simple_car.v0": 8.33,
+                        "{lead}.leadInstance.simple_car.x0": 30,
+                        "{cacc}.caccInstance.c1": 0.5,
+                        "{cacc}.caccInstance.eps": 1,
+                        "{cacc}.caccInstance.omega_n": 0.2,
+                        "{cacc}.caccInstance.initialAccel": 0.2,
+                        "{cacc}.caccInstance.targetDistance": 15,
+                        "{attack_plus_constant}.attack_plus_constantInstance.attackValue": 2,
+                        "{attack_plus_constant}.attack_plus_constantInstance.duration": 30,
+                        "{attack_plus_constant}.attack_plus_constantInstance.attackTime": 0,
+                        "{ego}.egoInstance.v0": 8.33,
+                        "{ego}.egoInstance.x0": 5
+                    },
+                    "algorithm": {
+                        "type": "fixed-step",
+                        "size": 0.01
+                    },
+                    "simulationProgramDelay": false
+                },
+                "critical_scenarios": {
+                    "event_1": { 
+                        "expression": "abs({ego}.egoInstance.x - {lead}.leadInstance.x) < 2", 
+                        "sensor": "cacc_sensor",
+                        "command": 2
+                    },
+                    "event_2": {
+                        "expression": "abs({ego}.egoInstance.x - {lead}.leadInstance.x) >= 30",
+                        "sensor": "cacc_sensor",
+                        "command": 5
+                    }
+                }
+            },
+            "-1": {
+                "command": -1
+            }
+        }
+    }
+}
