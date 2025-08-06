@@ -106,3 +106,8 @@ Supporting endpoints:
 
 ```bash
 pip install -r requirements.txt
+
+### Step 1 — Start RabbitMQ
+
+```bash
+sudo service rabbitmq-server start
