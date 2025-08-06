@@ -94,20 +94,58 @@ Supporting endpoints:
 
 ## Quick Start
 
-> The UNTWISTER framework is composed of six Flask-based microservices.
-> Each service runs independently and communicates via RabbitMQ and REST.
+> The UNTWISTER framework is composed of six Flask-based microservices.  
+> Each service runs independently and communicates via RabbitMQ and REST APIs.
 
 ### Prerequisites
 
 - Python ≥ 3.8  
 - RabbitMQ running locally (`localhost:5672`)  
 - INTO-CPS Maestro2 (for simulation-based validation)  
-- Install Python requirements:  
+
+Install Python requirements:
 
 ```bash
 pip install -r requirements.txt
+```
 
 ### Step 1 — Start RabbitMQ
 
 ```bash
 sudo service rabbitmq-server start
+```
+
+### Step 2 — Launch UNTWISTER services
+
+_Open six terminal windows (or use tmux) and run:_
+
+```bash
+# 1) Platform Manager
+python platform_manager.py
+
+# 2) Data Subscription & Collection
+python data_subscription_and_collection.py
+
+# 3) Detection & Classification
+python detection_and_classification.py
+
+# 4) Attack Mitigation
+python attack_mitigation.py
+
+# 5) Reconfiguration
+python reconfiguration.py
+
+# (Optional) 6) Model Creation / Training Module
+python model_creation/model_creation.py
+```
+
+### Step 3 — Configure and start the working phase
+
+```bash
+curl -X POST http://localhost:5000/start_platform_from_files
+```
+
+This instructs the platform manager to:
+- load `configuration_parameters.json` and `adversary_model.json`
+- send configuration to all services
+- broadcast the `START_WORKING_PHASE` command
